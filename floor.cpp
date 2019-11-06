@@ -1,6 +1,9 @@
 #include<iostream>
 #include<fstream>
 using namespace std;
+
+int battery_row,battery_col;
+
 typedef struct _Node
 {
     int row;
@@ -75,7 +78,7 @@ class my_queue
         Place* point_pop;
 };
 
-void BFStobattery(int battery_row,int battery_col,char** floor,int map_row,int map_col,Node** node)
+void BFStobattery(char** floor,int map_row,int map_col,Node** node)
 {
     my_queue q;
     q.push(battery_row,battery_col);
@@ -160,11 +163,9 @@ void DFSfrombattery(int map_row,int map_col,int start_row,int start_col,char**fl
     {
         DFSfrombattery(map_row,map_col,start_row,start_col+1,floor,DFS_node,BFS_node);
     }
-    if(counting)
-    {
-        printBFSpath(start_row,start_col,BFS_node);
-        counting--;
-    }
+    printBFSpath(start_row,start_col,BFS_node);
+
+
 }
 
 int main()
@@ -173,7 +174,6 @@ int main()
     int map_col;
     int battery;
 
-    int battery_row,battery_col;
     //ifstream fin("floor.data");
     //ofstream fout("final.path");
     cin>>map_row>>map_col>>battery;
@@ -207,6 +207,6 @@ int main()
     {
         DFS_arr_node[i]=DFS_node[i];
     }
-    BFStobattery(battery_row,battery_col,arr,map_row,map_col,BFS_arr_node);
+    BFStobattery(arr,map_row,map_col,BFS_arr_node);
     DFSfrombattery(map_row,map_col,battery_row,battery_col,arr,DFS_arr_node,BFS_arr_node);
 }
