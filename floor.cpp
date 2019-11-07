@@ -197,8 +197,9 @@ void findthenearest(char**check,int*nearest_row,int*nearest_col,int map_row,int 
     }
 }
 
-void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* end_row,int* end_col)
+void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* end_row,int* end_col,int battery,Node**node)
 {
+    int current_move=0;
     while(1)
     {
         if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
@@ -207,6 +208,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             check[row-1][col]='1';
             row=row-1;
             step++;
+            current_move++;
+            if(current_move+node[row][col].dis==battery)break;
             continue;
         }
         else if(floor[row+1][col]=='0'&&check[row+1][col]=='0'&&row+1<map_row)
@@ -215,6 +218,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             check[row+1][col]='1';
             row=row+1;
             step++;
+            current_move++;
+            if(current_move+node[row][col].dis==battery)break;
             continue;
         }
         else if(floor[row][col-1]=='0'&&check[row][col-1]=='0'&&col-1>=0)
@@ -223,6 +228,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             check[row][col-1]='1';
             col=col-1;
             step++;
+            current_move++;
+            if(current_move+node[row][col].dis==battery)break;
             continue;
         }
         else if(floor[row][col+1]=='0'&&check[row][col+1]=='0'&&col+1<map_col)
@@ -231,11 +238,14 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             check[row][col+1]='1';
             col=col+1;
             step++;
+            current_move++;
+            if(current_move+node[row][col].dis==battery)break;
             continue;
         }
         else
         {
             step++;
+            current_move++;
             check[row][col]='1';
             *end_row=row;
             *end_col=col;
@@ -313,11 +323,11 @@ int main()
         findthenearest(checkarr,&nearest_row,&nearest_col,map_row,map_col,BFS_arr_node);
         cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
         printBFSpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
-        DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col);
+        DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col,battery,BFS_arr_node);
         printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
     }
 
-    cout<<step-2<<endl;
+    cout<<step-3<<endl;
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
 
