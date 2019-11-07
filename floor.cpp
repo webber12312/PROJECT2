@@ -138,13 +138,14 @@ void BFStobattery(char** floor,int map_row,int map_col,Node** node)
     }
 }
 
-void printBFSpath(int finish_row,int finish_col,Node** node)
+void printBFSpath(int finish_row,int finish_col,Node** node,char**check)
 {
     if(node[finish_row][finish_col].parent[0]!=-1)
     {
-        printBFSpath(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node);
+        printBFSpath(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node,check);
     }
     cout<<finish_row<<" "<<finish_col<<endl;
+    check[finish_row][finish_col]='1';
     step++;
 }
 
@@ -176,22 +177,69 @@ bool checkisover(char**check,int map_row,int map_col)
     return true;
 }
 
-void findthefarest(char**check,int*farest_row,int*farest_col,int map_row,int map_col,Node**node)
+void findthenearest(char**check,int*nearest_row,int*nearest_col,int map_row,int map_col,Node**node)
 {
-    int cur_dis=0;
+    int cur_dis=10000;
     for(int i=0; i<map_row; i++)
     {
         for(int j=0; j<map_col; j++)
         {
             if(check[i][j]=='0')
             {
-                if(node[i][j].dis>cur_dis)
+                if(node[i][j].dis<cur_dis)
                 {
                     cur_dis=node[i][j].dis;
-                    *farest_row=i;
-                    *farest_col=j;
+                    *nearest_row=i;
+                    *nearest_col=j;
                 }
             }
+        }
+    }
+}
+
+void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* end_row,int* end_col)
+{
+    while(1)
+    {
+        if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
+        {
+            cout<<row-1<<" "<<col<<endl;
+            check[row-1][col]='1';
+            row=row-1;
+            step++;
+            continue;
+        }
+        else if(floor[row+1][col]=='0'&&check[row+1][col]=='0'&&row+1<map_row)
+        {
+            cout<<row+1<<" "<<col<<endl;
+            check[row+1][col]='1';
+            row=row+1;
+            step++;
+            continue;
+        }
+        else if(floor[row][col-1]=='0'&&check[row][col-1]=='0'&&col-1>=0)
+        {
+            cout<<row<<" "<<col-1<<endl;
+            check[row][col-1]='1';
+            col=col-1;
+            step++;
+            continue;
+        }
+        else if(floor[row][col+1]=='0'&&check[row][col+1]=='0'&&col+1<map_col)
+        {
+            cout<<row<<" "<<col+1<<endl;
+            check[row][col+1]='1';
+            col=col+1;
+            step++;
+            continue;
+        }
+        else
+        {
+            step++;
+            check[row][col]='1';
+            *end_row=row;
+            *end_col=col;
+            break;
         }
     }
 }
@@ -206,26 +254,27 @@ int main()
     //ifstream fin("floor.data");
     //ofstream fout("final.path");
     cin>>map_row>>map_col>>battery;
-    char floor[map_row][map_col+1];
+    char floor[map_row][map_col];
     char* arr[map_row];
-    for(int i=0; i<map_row; i++)
+    for(int i=0;i<map_row;i++)
     {
-        arr[i]=floor[i];
-        arr[i][map_col]='\0';
-        for(int j=0; j<map_col; j++)
+        for(int j=0;j<map_col;j++)
         {
             char c=getchar();
             if(c=='\n')
                 c=getchar();
-            arr[i][j]=c;
-            if(arr[i][j]=='R')
+            floor[i][j]=c;
+            if(floor[i][j]=='R')
             {
                 battery_row=i;
                 battery_col=j;
             }
         }
     }
-
+    for(int i=0;i<map_row;i++)
+    {
+        arr[i]=floor[i];
+    }
 
 
     Node BFS_node[map_row][map_col];
@@ -257,15 +306,18 @@ int main()
     }
     BFStobattery(arr,map_row,map_col,BFS_arr_node);
 
-    int farest_row,farest_col;
+    int nearest_row,nearest_col;
+    int end_row,end_col;
     while(!checkisover(checkarr,map_row,map_col))
     {
-        findthefarest(checkarr,&farest_row,&farest_col,map_row,map_col,BFS_arr_node);
-        printBFSpath(farest_row,farest_col,BFS_arr_node);
-        printBFSbackpath(farest_row,farest_col,BFS_arr_node,checkarr);
+        findthenearest(checkarr,&nearest_row,&nearest_col,map_row,map_col,BFS_arr_node);
+        cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
+        printBFSpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
+        DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col);
+        printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
     }
 
-    cout<<step-1<<endl;
+    cout<<step-2<<endl;
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
 
