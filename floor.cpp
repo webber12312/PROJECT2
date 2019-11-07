@@ -4,6 +4,7 @@ using namespace std;
 
 int battery_row,battery_col;
 int step=0;
+int cur_used_battery=0;
 
 typedef struct _Node
 {
@@ -133,6 +134,7 @@ void printBFSpath(int finish_row,int finish_col,Node** node,char**check)
     cout<<finish_row<<" "<<finish_col<<endl;
     check[finish_row][finish_col]='1';
     step++;
+    cur_used_battery++;
 }
 
 void printBFSbackpath(int finish_row,int finish_col,Node** node,char**check)
@@ -143,10 +145,11 @@ void printBFSbackpath(int finish_row,int finish_col,Node** node,char**check)
         int last_row,last_col;
         last_row=node[finish_row][finish_col].parent[0];
         last_col=node[finish_row][finish_col].parent[1];
-        cout<<last_row<<" "<<last_col<<endl;
+        if(node[last_row][last_col].parent[0]!=-1)cout<<last_row<<" "<<last_col<<endl;
         finish_row=last_row;
         finish_col=last_col;
         step++;
+        cur_used_battery++;
     }
 }
 
@@ -185,53 +188,70 @@ void findthenearest(char**check,int*nearest_row,int*nearest_col,int map_row,int 
 
 void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* end_row,int* end_col,int battery,Node**node)
 {
-    int current_move=0;
     while(1)
     {
         if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
         {
+            if(cur_used_battery+node[row-1][col].dis>battery)
+            {
+                *end_row=row;
+                *end_col=col;
+                break;
+            }
             cout<<row-1<<" "<<col<<endl;
             check[row-1][col]='1';
             row=row-1;
             step++;
-            current_move++;
-            if(current_move+node[row][col].dis==battery)break;
+            cur_used_battery++;
             continue;
         }
         else if(floor[row+1][col]=='0'&&check[row+1][col]=='0'&&row+1<map_row)
         {
+            if(cur_used_battery+node[row+1][col].dis>battery)
+            {
+                *end_row=row;
+                *end_col=col;
+                break;
+            }
             cout<<row+1<<" "<<col<<endl;
             check[row+1][col]='1';
             row=row+1;
             step++;
-            current_move++;
-            if(current_move+node[row][col].dis==battery)break;
+            cur_used_battery++;
             continue;
         }
         else if(floor[row][col-1]=='0'&&check[row][col-1]=='0'&&col-1>=0)
         {
+            if(cur_used_battery+node[row][col-1].dis>battery)
+            {
+                *end_row=row;
+                *end_col=col;
+                break;
+            }
             cout<<row<<" "<<col-1<<endl;
             check[row][col-1]='1';
             col=col-1;
             step++;
-            current_move++;
-            if(current_move+node[row][col].dis==battery)break;
+            cur_used_battery++;
             continue;
         }
         else if(floor[row][col+1]=='0'&&check[row][col+1]=='0'&&col+1<map_col)
         {
+            if(cur_used_battery+node[row][col+1].dis>battery)
+            {
+                *end_row=row;
+                *end_col=col;
+                break;
+            }
             cout<<row<<" "<<col+1<<endl;
             check[row][col+1]='1';
             col=col+1;
             step++;
-            current_move++;
-            if(current_move+node[row][col].dis==battery)break;
+            cur_used_battery++;
             continue;
         }
         else
         {
-            step++;
-            current_move++;
             check[row][col]='1';
             *end_row=row;
             *end_col=col;
@@ -240,7 +260,7 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
     }
 }
 
-void DFSsearch(char**check,char**floor,int map_row,int map_col,int row,int col)
+/*void DFSsearch(char**check,char**floor,int map_row,int map_col,int row,int col)
 {
     //cout<<row<<" "<<col<<endl;
     if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
@@ -272,7 +292,7 @@ void DFSsearch(char**check,char**floor,int map_row,int map_col,int row,int col)
         DFSsearch(check,floor,map_row,map_col,row,col+1);
     }
     cout<<row<<" "<<col<<endl;
-}
+}*/
 
 
 int main()
@@ -343,12 +363,15 @@ int main()
         findthenearest(checkarr,&nearest_row,&nearest_col,map_row,map_col,BFS_arr_node);
         cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
         printBFSpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
-        DFSsearch(checkarr,arr,map_row,map_col,nearest_row,nearest_col);
-        //DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col,battery,BFS_arr_node);
-        printBFSbackpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
+        cur_used_battery--;
+        step--;
+        //DFSsearch(checkarr,arr,map_row,map_col,nearest_row,nearest_col);
+        DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col,battery,BFS_arr_node);
+        printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
+        cur_used_battery=0;
     }
-
-    cout<<step-3<<endl;
+    cout<<battery_row<<" "<<battery_col<<endl;
+    cout<<step<<endl;
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
 
