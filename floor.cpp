@@ -14,72 +14,60 @@ typedef struct _Node
     int parent[2];//parent[0]=row,parent[1]=col
 } Node;
 
-typedef struct _place
+class Place
 {
+    public:
     int row;
     int col;
-} Place;
+    Place* next;
+    Place(int x,int y):row(x),col(y),next(NULL){}
+};
 
 class my_queue
 {
 public:
     my_queue()
     {
-        point=NULL;
-        point_pop=&(data[0]);
+        my_front=NULL;
+        my_back=NULL;
     }
     void push(int row,int col)
     {
-        if(point==NULL)
+        if(isempty())
         {
-            point=&(data[0]);
-            point->row=row;
-            point->col=col;
+            my_front=new Place(row,col);
+            my_back=my_front;
         }
         else
         {
-            point++;
-            point->row=row;
-            point->col=col;
+            Place*node=new Place(row,col);
+            my_back->next=node;
+            my_back=node;
+
         }
     }
     void pop()
     {
-        point_pop++;
+        Place*node=my_front;
+        my_front=my_front->next;
+        delete node;
     }
-    void clear()
+    int isempty()
     {
-        point=NULL;
-        point_pop=&(data[0]);
-    }
-    int empty()
-    {
-        if(point_pop==point+1)
-            return true;
-        else
-            return false;
+        if(my_front==NULL||my_back==NULL)return true;
+        else return false;
     }
     int front_row()
     {
-        return point_pop->row;
+        return my_front->row;
     }
     int front_col()
     {
-        return point_pop->col;
+        return my_front->col;
     }
-    /*void setvisit()
-    {
-        point->visited=true;
-    }*/
-    /*void setparent(int lastrow,int lastcol)
-    {
-        point->parent[0]=lastrow;
-        point->parent[1]=lastcol;
-    }*/
 private:
-    Place data[100000];
-    Place* point;
-    Place* point_pop;
+    Place* my_front;
+    Place* my_back;
 };
 
 void BFStobattery(char** floor,int map_row,int map_col,Node** node)
@@ -92,7 +80,7 @@ void BFStobattery(char** floor,int map_row,int map_col,Node** node)
     node[battery_row][battery_col].parent[1]=-1;
     node[battery_row][battery_col].visited=true;
     node[battery_row][battery_col].dis=0;
-    while(!q.empty())
+    while(!q.isempty())
     {
         if(q.front_row()-1>=0&&floor[q.front_row()-1][q.front_col()]!='1'&&node[q.front_row()-1][q.front_col()].visited==false)
         {
