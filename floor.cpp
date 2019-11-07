@@ -74,8 +74,6 @@ void BFStobattery(char** floor,int map_row,int map_col,Node** node)
 {
     my_queue q;
     q.push(battery_row,battery_col);
-    //q.setvisit();
-    //q.setparent(-1,-1);
     node[battery_row][battery_col].parent[0]=-1;
     node[battery_row][battery_col].parent[1]=-1;
     node[battery_row][battery_col].visited=true;
@@ -242,6 +240,40 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
     }
 }
 
+void DFSsearch(char**check,char**floor,int map_row,int map_col,int row,int col)
+{
+    //cout<<row<<" "<<col<<endl;
+    if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
+    {
+        step++;
+        check[row-1][col]='1';
+        cout<<row<<" "<<col<<endl;
+        DFSsearch(check,floor,map_row,map_col,row-1,col);
+    }
+    if(floor[row+1][col]=='0'&&check[row+1][col]=='0'&&row+1<map_row)
+    {
+        step++;
+        check[row+1][col]='1';
+        cout<<row<<" "<<col<<endl;
+        DFSsearch(check,floor,map_row,map_col,row+1,col);
+    }
+    if(floor[row][col-1]=='0'&&check[row][col-1]=='0'&&col-1>=0)
+    {
+        step++;
+        check[row][col-1]='1';
+        cout<<row<<" "<<col<<endl;
+        DFSsearch(check,floor,map_row,map_col,row,col-1);
+    }
+    if(floor[row][col+1]=='0'&&check[row][col+1]=='0'&&col+1<map_col)
+    {
+        step++;
+        check[row][col+1]='1';
+        cout<<row<<" "<<col<<endl;
+        DFSsearch(check,floor,map_row,map_col,row,col+1);
+    }
+    cout<<row<<" "<<col<<endl;
+}
+
 
 int main()
 {
@@ -311,8 +343,9 @@ int main()
         findthenearest(checkarr,&nearest_row,&nearest_col,map_row,map_col,BFS_arr_node);
         cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
         printBFSpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
-        DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col,battery,BFS_arr_node);
-        printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
+        DFSsearch(checkarr,arr,map_row,map_col,nearest_row,nearest_col);
+        //DFS(checkarr,arr,nearest_row,nearest_col,map_row,map_col,&end_row,&end_col,battery,BFS_arr_node);
+        printBFSbackpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
     }
 
     cout<<step-3<<endl;
