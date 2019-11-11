@@ -192,7 +192,7 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
     {
         if(floor[row-1][col]=='0'&&check[row-1][col]=='0'&&row-1>=0)
         {
-            if(cur_used_battery+node[row-1][col].dis>battery)
+            if(cur_used_battery+node[row-1][col].dis+1>battery)
             {
                 *end_row=row;
                 *end_col=col;
@@ -207,7 +207,7 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
         }
         else if(floor[row+1][col]=='0'&&check[row+1][col]=='0'&&row+1<map_row)
         {
-            if(cur_used_battery+node[row+1][col].dis>battery)
+            if(cur_used_battery+node[row+1][col].dis+1>battery)
             {
                 *end_row=row;
                 *end_col=col;
@@ -222,7 +222,7 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
         }
         else if(floor[row][col-1]=='0'&&check[row][col-1]=='0'&&col-1>=0)
         {
-            if(cur_used_battery+node[row][col-1].dis>battery)
+            if(cur_used_battery+node[row][col-1].dis+1>battery)
             {
                 *end_row=row;
                 *end_col=col;
@@ -237,7 +237,7 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
         }
         else if(floor[row][col+1]=='0'&&check[row][col+1]=='0'&&col+1<map_col)
         {
-            if(cur_used_battery+node[row][col+1].dis>battery)
+            if(cur_used_battery+node[row][col+1].dis+1>battery)
             {
                 *end_row=row;
                 *end_col=col;
@@ -370,7 +370,6 @@ int main()
         printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
         cur_used_battery=0;
     }
-    cout<<battery_row<<" "<<battery_col<<endl;
     cout<<step<<endl;
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
