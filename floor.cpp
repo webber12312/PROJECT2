@@ -449,17 +449,23 @@ int main()
 
     ifstream fin("floor.data");
     ofstream fout("final.path");
-    cin>>map_row>>map_col>>battery;
-    char floor[map_row][map_col];
+    fin>>map_row>>map_col>>battery;
+    char floor[map_row][map_col+1];
     char* arr[map_row];
+
+    for(int i=0;i<map_row;i++)
+    {
+        fin>>floor[i];
+    }
+
     for(int i=0; i<map_row; i++)
     {
         for(int j=0; j<map_col; j++)
         {
-            char c=getchar();
+            /*char c=getchar();
             if(c=='\n')
                 c=getchar();
-            floor[i][j]=c;
+            floor[i][j]=c;*/
             if(floor[i][j]=='R')
             {
                 battery_row=i;
@@ -512,12 +518,12 @@ int main()
     }
     //cout<<battery_row<<" "<<battery_col<<endl;
     fprintf(fp,"%d %d\n",battery_row,battery_col);
-    cout<<step<<endl;
+    fout<<step<<endl;
     rewind(fp);
     char path[5];
     while(fgets(path,5,fp))
     {
-        cout<<path;
+        fout<<path;
     }
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
