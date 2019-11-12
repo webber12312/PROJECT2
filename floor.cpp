@@ -6,6 +6,8 @@ using namespace std;
 int battery_row,battery_col;
 int step=0;
 int cur_used_battery=0;
+bool pass_battery=false;
+FILE*fp=tmpfile();
 
 typedef struct _Node
 {
@@ -134,7 +136,8 @@ void printBFSpath(int finish_row,int finish_col,Node** node,char**check)
     {
         printBFSpath(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node,check);
     }
-    cout<<finish_row<<" "<<finish_col<<endl;
+    //cout<<finish_row<<" "<<finish_col<<endl;
+    fprintf(fp,"%d %d\n",finish_row,finish_col);
     check[finish_row][finish_col]='1';
     step++;
     cur_used_battery++;
@@ -147,10 +150,13 @@ void printBFSpath2(int finish_row,int finish_col,Node** node,char**check)
         printBFSpath2(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node,check);
     }
     if(node[finish_row][finish_col].parent[0]!=-1)
-    {cout<<finish_row<<" "<<finish_col<<endl;
-    check[finish_row][finish_col]='1';
-    step++;
-    cur_used_battery++;}
+    {
+        //cout<<finish_row<<" "<<finish_col<<endl;
+        fprintf(fp,"%d %d\n",finish_row,finish_col);
+        check[finish_row][finish_col]='1';
+        step++;
+        cur_used_battery++;
+    }
 }
 
 void printBFSbackpath(int finish_row,int finish_col,Node** node,char**check)
@@ -162,7 +168,8 @@ void printBFSbackpath(int finish_row,int finish_col,Node** node,char**check)
         last_row=node[finish_row][finish_col].parent[0];
         last_col=node[finish_row][finish_col].parent[1];
         if(node[last_row][last_col].parent[0]!=-1)
-            cout<<last_row<<" "<<last_col<<endl;
+            //cout<<last_row<<" "<<last_col<<endl;
+            fprintf(fp,"%d %d\n",last_row,last_col);
         finish_row=last_row;
         finish_col=last_col;
         step++;
@@ -204,26 +211,6 @@ int findthenearest(char**check,int*nearest_row,int*nearest_col,int map_row,int m
     return cur_dis;
 }
 
-int findthenearest_of_twopoints(char**check,int*nearest_row,int*nearest_col,int map_row,int map_col,int cur_row,int cur_col)
-{
-    int cur_dis=10000;
-    for(int i=0; i<map_row; i++)
-    {
-        for(int j=0; j<map_col; j++)
-        {
-            if(check[i][j]=='0')
-            {
-                if(abs(i-cur_row)+abs(j-cur_col)<cur_dis)
-                {
-                    cur_dis=abs(i-cur_row)+abs(j-cur_col);
-                    *nearest_row=i;
-                    *nearest_col=j;
-                }
-            }
-        }
-    }
-    return cur_dis;
-}
 
 void BFStonearest(char** floor,char**check,int map_row,int map_col,Node** node,int cur_row,int cur_col)
 {
@@ -277,9 +264,9 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,Node** node,i
         }
         q.pop();
     }
-    for(int i=0;i<map_row;i++)
+    for(int i=0; i<map_row; i++)
     {
-        for(int j=0;j<map_col;j++)
+        for(int j=0; j<map_col; j++)
         {
             node[i][j].visited=false;
         }
@@ -287,17 +274,17 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,Node** node,i
 }
 
 
-/*void printpath_between_pts(int start_row,int start_col,Node** node,char**check,int finish_row,int finish_col)
+void ispassbattery(int finish_row,int finish_col,Node** node,char**check)
 {
-    if(node[finish_row][finish_col].parent[0]!=node[start_row][start_col].parent[0]||node[finish_row][finish_col].parent[1]!=node[start_row][start_col].parent[1])
+    if(node[finish_row][finish_col].parent[0]!=-1)
     {
-        printpath_between_pts(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node,check,finish_row,finish_col);
+        ispassbattery(node[finish_row][finish_col].parent[0],node[finish_row][finish_col].parent[1],node,check);
     }
-    cout<<start_row<<" "<<start_col<<endl;
-    check[finish_row][finish_col]='1';
-    step++;
-    cur_used_battery++;
-}*/
+    if(finish_row+1==battery_row&&finish_col==battery_col)pass_battery=true;
+    else if(finish_row-1==battery_row&&finish_col==battery_col)pass_battery=true;
+    else if(finish_row==battery_row&&finish_col+1==battery_col)pass_battery=true;
+    else if(finish_row==battery_row&&finish_col-1==battery_col)pass_battery=true;
+}
 
 
 void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* end_row,int* end_col,int battery,Node**node)
@@ -318,7 +305,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
                 *end_col=col;
                 break;
             }
-            cout<<row-1<<" "<<col<<endl;
+            //cout<<row-1<<" "<<col<<endl;
+            fprintf(fp,"%d %d\n",row-1,col);
             check[row-1][col]='1';
             row=row-1;
             step++;
@@ -333,7 +321,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
                 *end_col=col;
                 break;
             }
-            cout<<row+1<<" "<<col<<endl;
+            //cout<<row+1<<" "<<col<<endl;
+            fprintf(fp,"%d %d\n",row+1,col);
             check[row+1][col]='1';
             row=row+1;
             step++;
@@ -348,7 +337,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
                 *end_col=col;
                 break;
             }
-            cout<<row<<" "<<col-1<<endl;
+            //cout<<row<<" "<<col-1<<endl;
+            fprintf(fp,"%d %d\n",row,col-1);
             check[row][col-1]='1';
             col=col-1;
             step++;
@@ -363,7 +353,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
                 *end_col=col;
                 break;
             }
-            cout<<row<<" "<<col+1<<endl;
+            //cout<<row<<" "<<col+1<<endl;
+            fprintf(fp,"%d %d\n",row,col+1);
             check[row][col+1]='1';
             col=col+1;
             step++;
@@ -395,6 +386,15 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             }
             else
             {
+                ispassbattery(nearest_row,nearest_col,DFS_arr_node,check);
+                if(pass_battery==true)
+                {
+                    check[row][col]='1';
+                    *end_row=row;
+                    *end_col=col;
+                    pass_battery=false;
+                    break;
+                }
                 printBFSpath2(nearest_row,nearest_col,DFS_arr_node,check);
                 row=nearest_row;
                 col=nearest_col;
@@ -440,12 +440,15 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
 
 int main()
 {
+
+
+
     int map_row;
     int map_col;
     int battery;
 
-    //ifstream fin("floor.data");
-    //ofstream fout("final.path");
+    ifstream fin("floor.data");
+    ofstream fout("final.path");
     cin>>map_row>>map_col>>battery;
     char floor[map_row][map_col];
     char* arr[map_row];
@@ -498,7 +501,7 @@ int main()
     while(!checkisover(checkarr,map_row,map_col))
     {
         findthenearest(checkarr,&nearest_row,&nearest_col,map_row,map_col,BFS_arr_node);
-        cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
+        //cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
         printBFSpath(nearest_row,nearest_col,BFS_arr_node,checkarr);
         cur_used_battery--;
         step--;
@@ -507,8 +510,15 @@ int main()
         printBFSbackpath(end_row,end_col,BFS_arr_node,checkarr);
         cur_used_battery=0;
     }
-    cout<<battery_row<<" "<<battery_col<<endl;
+    //cout<<battery_row<<" "<<battery_col<<endl;
+    fprintf(fp,"%d %d\n",battery_row,battery_col);
     cout<<step<<endl;
+    rewind(fp);
+    char path[5];
+    while(fgets(path,5,fp))
+    {
+        cout<<path;
+    }
     //printBFSpath(1,3,BFS_arr_node);
     //printBFSbackpath(1,3,BFS_arr_node);
 
