@@ -216,27 +216,6 @@ int findthenearest_BFS(char**check,int*nearest_row,int*nearest_col,int map_row,i
     return cur_dis;
 }
 
-int findthenearest_DFS(char**check,int*nearest_row,int*nearest_col,int map_row,int map_col)
-{
-    int cur_dis=1000000;
-    for(int i=0; i<map_row; i++)
-    {
-        for(int j=0; j<map_col; j++)
-        {
-            if(check[i][j]=='0')
-            {
-                if(DFS_node[i][j].dis<cur_dis)
-                {
-                    cur_dis=DFS_node[i][j].dis;
-                    *nearest_row=i;
-                    *nearest_col=j;
-                }
-            }
-        }
-    }
-    return cur_dis;
-}
-
 
 int BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,int cur_col,int* nearest_row,int* nearest_col)
 {
@@ -561,7 +540,7 @@ int main()
     while(!checkisover(checkarr,map_row,map_col))
     {
         findthenearest_BFS(checkarr,&nearest_row,&nearest_col,map_row,map_col);
-        //cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl;
+        //cout<<"the nearrow is"<<nearest_row<<"the nearest col is"<<nearest_col<<endl
         printBFSpath(nearest_row,nearest_col,checkarr);
         cur_used_battery--;
         step--;
