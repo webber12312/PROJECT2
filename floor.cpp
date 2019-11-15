@@ -1,7 +1,8 @@
 #include<iostream>
 #include<fstream>
-#include<cmath>
 using namespace std;
+
+
 
 int battery_row,battery_col;
 int step=0;
@@ -237,7 +238,7 @@ int findthenearest_DFS(char**check,int*nearest_row,int*nearest_col,int map_row,i
 }
 
 
-void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,int cur_col)
+int BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,int cur_col,int* nearest_row,int* nearest_col)
 {
     my_queue q;
     q.push(cur_row,cur_col);
@@ -245,6 +246,7 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
     DFS_node[cur_row][cur_col].parent[1]=-1;
     DFS_node[cur_row][cur_col].visited=true;
     DFS_node[cur_row][cur_col].dis=0;
+    int dis;
     while(!q.isempty())
     {
         if(q.front_row()-1>=0&&floor[q.front_row()-1][q.front_col()]!='1'&&DFS_node[q.front_row()-1][q.front_col()].visited==false)
@@ -256,6 +258,13 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
             DFS_node[q.front_row()-1][q.front_col()].parent[0]=q.front_row();
             DFS_node[q.front_row()-1][q.front_col()].parent[1]=q.front_col();
             DFS_node[q.front_row()-1][q.front_col()].dis=DFS_node[q.front_row()][q.front_col()].dis+1;
+            if(check[q.front_row()-1][q.front_col()]!='1')
+            {
+                *nearest_row=q.front_row()-1;
+                *nearest_col=q.front_col();
+                dis=DFS_node[q.front_row()-1][q.front_col()].dis;
+                break;
+            }
         }
         if(q.front_row()+1<map_row&&floor[q.front_row()+1][q.front_col()]!='1'&&DFS_node[q.front_row()+1][q.front_col()].visited==false)
         {
@@ -266,6 +275,13 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
             DFS_node[q.front_row()+1][q.front_col()].parent[0]=q.front_row();
             DFS_node[q.front_row()+1][q.front_col()].parent[1]=q.front_col();
             DFS_node[q.front_row()+1][q.front_col()].dis=DFS_node[q.front_row()][q.front_col()].dis+1;
+            if(check[q.front_row()+1][q.front_col()]!='1')
+            {
+                *nearest_row=q.front_row()+1;
+                *nearest_col=q.front_col();
+                dis=DFS_node[q.front_row()+1][q.front_col()].dis;
+                break;
+            }
         }
         if(q.front_col()-1>=0&&floor[q.front_row()][q.front_col()-1]!='1'&&DFS_node[q.front_row()][q.front_col()-1].visited==false)
         {
@@ -276,6 +292,13 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
             DFS_node[q.front_row()][q.front_col()-1].parent[0]=q.front_row();
             DFS_node[q.front_row()][q.front_col()-1].parent[1]=q.front_col();
             DFS_node[q.front_row()][q.front_col()-1].dis=DFS_node[q.front_row()][q.front_col()].dis+1;
+            if(check[q.front_row()][q.front_col()-1]!='1')
+            {
+                *nearest_row=q.front_row();
+                *nearest_col=q.front_col()-1;
+                dis=DFS_node[q.front_row()][q.front_col()-1].dis;
+                break;
+            }
         }
         if(q.front_col()+1<map_col&&floor[q.front_row()][q.front_col()+1]!='1'&&DFS_node[q.front_row()][q.front_col()+1].visited==false)
         {
@@ -286,6 +309,13 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
             DFS_node[q.front_row()][q.front_col()+1].parent[0]=q.front_row();
             DFS_node[q.front_row()][q.front_col()+1].parent[1]=q.front_col();
             DFS_node[q.front_row()][q.front_col()+1].dis=DFS_node[q.front_row()][q.front_col()].dis+1;
+            if(check[q.front_row()][q.front_col()+1]!='1')
+            {
+                *nearest_row=q.front_row();
+                *nearest_col=q.front_col()+1;
+                dis=DFS_node[q.front_row()][q.front_col()+1].dis;
+                break;
+            }
         }
         q.pop();
     }
@@ -296,6 +326,7 @@ void BFStonearest(char** floor,char**check,int map_row,int map_col,int cur_row,i
             DFS_node[i][j].visited=false;
         }
     }
+    return dis;
 }
 
 
@@ -392,8 +423,8 @@ void DFS(char**check,char**floor,int row,int col,int map_row,int map_col,int* en
             *end_col=col;
             break;*/
             int nearest_row,nearest_col;
-            BFStonearest(floor,check,map_row,map_col,row,col);
-            int dis=findthenearest_DFS(check,&nearest_row,&nearest_col,map_row,map_col);
+            int dis=BFStonearest(floor,check,map_row,map_col,row,col,&nearest_row,&nearest_col);
+            //int dis=findthenearest_DFS(check,&nearest_row,&nearest_col,map_row,map_col);
             if(checkisover(check,map_row,map_col))
             {
                 check[row][col]='1';
